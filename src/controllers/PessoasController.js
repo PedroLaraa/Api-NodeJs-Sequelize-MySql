@@ -31,18 +31,28 @@ class PessoaController {
 
     static async cadastraUmaPessoa(req, res) {
 
-        const dataToInsert = req.body
+        const dataToInsert = req.body;
 
         try{
-
             const dataInsert = db.Pessoas.create(dataToInsert);
             return res.status(200).json(dataToInsert);
 
         }catch(err){
             return res.status(500).json(err.message);
-        }
+        };
+    };
 
-    }
+    static deletaUmaPessoa(req, res) {
+        const {id} = req.params
+
+        try{
+            const dataToDelete = db.Pessoas.destroy({ where: { id: id } });
+            return res.status(200).send({message: 'Deletado com sucesso!!!'});
+
+        }catch(err){
+            return res.status(500).json(err.message);
+        };
+    };
 };
 
 module.exports = PessoaController;
