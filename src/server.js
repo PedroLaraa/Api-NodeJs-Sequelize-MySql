@@ -10,7 +10,7 @@ app.use(bodyParser.json()); // Avisa o Express que o body parser vai pegar os da
 
 app.get('/teste', (req, res) => {
     res.status(200).send({message: 'Funcionando!'});
-})
+});
 
 app.listen(port, () => {
     console.log('Server rodando na porta:', port);
