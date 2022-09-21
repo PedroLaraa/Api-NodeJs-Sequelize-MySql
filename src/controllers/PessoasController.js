@@ -53,6 +53,21 @@ class PessoaController {
             return res.status(500).json(err.message);
         };
     };
+
+    static atualizaUmaPessoa(req, res) {
+        const {id} = req.params
+
+        try{
+            const dataToUpdate = db.Pessoas.update(req.body, {
+                where:{
+                    id:id
+                }
+            });
+            return res.status(200).send({message: 'Editado com sucesso!!!'});
+        }catch(err){
+            return res.status(500).json(err.message);
+        };
+    };
 };
 
 module.exports = PessoaController;
