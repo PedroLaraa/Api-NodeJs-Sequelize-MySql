@@ -10,6 +10,7 @@ router
     .get('/pessoas/:estudanteId/matricula/:matriculaId', PessoaController.pegaMatriculaDeUmaPessoa)
     .get('/pessoas/:idEstudante/matriculas', PessoaController.pegaMatriculaDoEstudante)
     .get('/pessoas/matricula/:turmaId/confirmadas', PessoaController.pegaMatriculaPorTurma)
+    .get('/pessoas/matricula/lotada', PessoaController.pegaTurmasLotadas)
     .post('/pessoas', PessoaController.cadastraUmaPessoa)
     .post('/pessoas/:estudanteId/matricula', PessoaController.cadastraUmaMatricula)
     .post('/pessoas/:idPessoa/restaura', PessoaController.restauraPessoa)
