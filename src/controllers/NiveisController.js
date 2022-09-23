@@ -1,5 +1,9 @@
 const db = require('../models');
 
+const NiveisServices = require('../services/NiveisServices.js');
+
+const niveisServices = new NiveisServices('Niveis')
+
 class NiveisController {
 
     static async pegaTodosNiveis(req, res) {

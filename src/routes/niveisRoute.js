@@ -12,7 +12,5 @@ router
     .put('/niveis/:id', NiveisController.editaUmNivel)
     .delete('/niveis/:id', NiveisController.deletaUmNivel)
     .post('/niveis/:id/restaura', NiveisController.restauraNivel)
-    .post('/pessoas/:estudanteId/matricula/:matriculaId/restaura', PessoaController.restauraMatricula)
-
 
 module.exports = router;

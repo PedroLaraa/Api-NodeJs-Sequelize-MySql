@@ -2,234 +2,103 @@ const db = require('../models');
 
 const Sequelize = require('sequelize');
 
-const Services = require('../services/Services')
+const PessoasServices = require('../services/PessoasServices');
 
-const pessoasServices = new Services('Pessoas')
-
+const pessoasServices = new PessoasServices('Pessoas')
 class PessoaController {
+
+    static async pegaPessoasAtivas(req, res) {
+        try {
+            const pessoasAtivas = await pessoasServices.pegaRegistrosAtivos()
+            return res.status(200).json(pessoasAtivas)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
     static async pegaTodasAsPessoas(req, res) {
         try {
-            const todasAsPessoas = await db.Pessoas.scope('todos').findAll();
-            return res.status(200).json(todasAsPessoas);
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
+            const todasAsPessoas = await pessoasServices.pegaTodosOsRegistros()
+            return res.status(200).json(todasAsPessoas)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
-    static async pegaAsPessoasAtivas(req, res) {
+    static async pegaPessoa(req, res) {
+        const { id } = req.params
         try {
-            const pessoasAtivas = await pessoasServices.pegaTodosOsRegistros();
-            return res.status(200).json(pessoasAtivas);
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
+            const pessoa = await pessoasServices.pegaUmRegistro({ id })
+            return res.status(200).json(pessoa)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
-    static async pegaUmaPessoa(req, res) {
-        const { id } = req.params;
-
+    static async criaPessoa(req, res) {
+        const novaPessoa = req.body
         try {
+            const novaPessoaCriada = await pessoasServices.criaRegistro(novaPessoa)
+            return res.status(200).json(novaPessoaCriada)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
-            const umaPessoa = await db.Pessoas.findOne({
-                where: {
-                    id: id
-                }
-            });
-            return res.status(200).json(umaPessoa);
-
-        } catch (err) {
-            return res.status(500).json(err.message);
-
-        };
-    };
-
-    static async cadastraUmaPessoa(req, res) {
-        const dataToInsert = req.body;
-
-        try {
-            const dataInsert = await db.Pessoas.create(dataToInsert);
-            return res.status(200).json(dataToInsert);
-
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async deletaUmaPessoa(req, res) {
-        const { id } = req.params;
-
-        try {
-            const dataToDelete = await db.Pessoas.destroy({ where: { id: id } });
-            return res.status(200).send({ message: 'Deletado com sucesso!!!' });
-
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async atualizaUmaPessoa(req, res) {
-        const { id } = req.params;
-
-        try {
-            const dataToUpdate = await db.Pessoas.update(req.body, {
-                where: {
-                    id: id
-                }
-            });
-            return res.status(200).send({ message: 'Editado com sucesso!!!' });
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async pegaMatriculaDeUmaPessoa(req, res) {
-        const { estudanteId, matriculaId } = req.params;
-
-        try {
-            const matriculaRecuperada = await db.Matriculas.findOne({
-                where: {
-                    id: Number(matriculaId),
-                    estudante_id: Number(estudanteId)
-                }
-            });
-            return res.status(200).json(matriculaRecuperada)
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async cadastraUmaMatricula(req, res) {
-        const { estudanteId } = req.params
-
-        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }
-
-        try {
-            const matriculaCriada = await db.Matriculas.create(novaMatricula);
-            return res.status(200).json(matriculaCriada);
-
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async atualizaUmaMatricula(req, res) {
-        const { estudanteId, matriculaId } = req.params;
-
+    static async atualizaPessoa(req, res) {
+        const { id } = req.params
         const novasInfos = req.body
-
         try {
-            const dataToUpdate = await db.Matriculas.update(novasInfos, {
-                where: {
-                    id: Number(matriculaId),
-                    estudante_id: Number(estudanteId)
-                }
-            });
-            return res.status(200).send({ message: 'Editado com sucesso!!!' });
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
+            await pessoasServices.atualizaRegistro(novasInfos, Number(id))
+            return res.status(200).json({ mensagem: `id ${id} atualizado` })
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
-    static async deletaUmaMatricula(req, res) {
-        const { idMatricula } = req.params
-
+    static async apagaPessoa(req, res) {
+        const { id } = req.params
         try {
-            const matriculaDeletada = await db.Matriculas.destroy({ where: { id: idMatricula } })
-            return res.status(200).send({ message: `Id ${idMatricula} deletado com sucesso!` })
-        } catch (err) {
-            return res.status(500).send({ message: `Falha ao deletar!` })
+            await pessoasServices.apagaRegistro(Number(id))
+            return res.status(200).json({ mensagem: `id ${id} deletado` })
+        } catch (error) {
+            return res.status(500).json(error.message)
         }
     }
 
     static async restauraPessoa(req, res) {
-        const { idPessoa } = req.params
-
+        const { id } = req.params
         try {
-            await db.Pessoas.restore({ where: { id: idPessoa } });
-            return res.status(200).json({ message: 'Registro restaurado com sucesso!' });
-        } catch (err) {
-            return res.status(500).send({ message: `Falha ao retornar registro!` });
-        };
-    };
-
-    static async restauraMatricula(req, res) {
-        const { estudanteId, matriculaId } = req.params;
-
-        try {
-            await database.Matriculas.restore({
-                where: {
-                    id: Number(matriculaId),
-                    estudante_id: Number(estudanteId)
-                }
-            });
-            return res.status(200).json({ mensagem: `id ${id} restaurado` });
+            const registroRestaurado = await pessoasServices
+                .restauraRegistro(Number(id))
+            return res.status(200).json(registroRestaurado)
         } catch (error) {
-            return res.status(500).json(error.message);
-        };
-    };
+            return res.status(500).json(error.message)
+        }
+    }
 
-    static async pegaMatriculaDoEstudante(req, res) {
-        const { idEstudante } = req.params;
-
+    static async pegaMatriculas(req, res) {
+        const { estudanteId } = req.params
         try {
-            const umaPessoa = await db.Pessoas.findOne({ where: { id: idEstudante } });
-            const matriculas = await umaPessoa.getAulasMatriculadas();
-            return res.status(200).json(matriculas);
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async pegaMatriculaPorTurma(req, res) {
-        const { turmaId } = req.params;
-
-        try {
-            const todasAsMatriculas = await db.Matriculas.findAndCountAll({
-                where: {
-                    turma_id: turmaId,
-                    status: 'confirmado'
-                },
-                limit: 1,
-                order: [['estudante_id', 'ASC']]
-            });
-            return res.status(200).json(todasAsMatriculas);
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
-
-    static async pegaTurmasLotadas(req, res) {
-        const lotacaoTurma = 2;
-
-        try {
-            const turmasLotadas = await db.Matriculas.findAndCountAll({
-                where:{
-                    status: 'confirmado'
-                },
-                attributes: ['turma_id'],
-                group: ['turma_id'],
-                having: Sequelize.literal(`count(turma_id) >= ${lotacaoTurma}`)
-            });
-            res.status(200).json(turmasLotadas.count);
-        } catch (err) {
-            return res.status(500).json(err.message);
-        };
-    };
+            const matriculas = await pessoasServices
+                .pegaMatriculasPorEstudante({ id: Number(estudanteId) })
+            return res.status(200).json(matriculas)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
     static async cancelaPessoa(req, res) {
-        const { idEstudante } = req.params;
-
+        const { estudanteId } = req.params
         try {
-            db.sequelize.transaction(async t => {
-                await db.Pessoas.update({ ativo: false }, { where: { id: idEstudante }}, {transaction: t});
-                await db.Pessoas.update({ status: 'cancelado'}, {where: { estudante_id: idEstudante }}, {transaction: t});
-                return res.status(200).json({message: 'Matrícula cancelada!'});
-            });
-        } catch (err) {
-            return res.status(500).json(err);
-        };
-    };
+            await pessoasServices.cancelaPessoaEMatriculas(Number(estudanteId))
+            return res
+                .status(200)
+                .json({ message: `matrículas ref. estudante ${estudanteId} canceladas` })
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }
 
 };
 
